@@ -1,8 +1,13 @@
 {
   inputs.nixpkgs.url = github:NixOS/nixpkgs;
   inputs.disko.url = github:nix-community/disko?ref=zap;
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.flake-compat = {
+    url = "github:edolstra/flake-compat";
+    flake = false;
+  };
 
-  outputs = { self, nixpkgs, disko, ... }@attrs: {
+  outputs = { self, nixpkgs, disko, flake-utils, flake-compat, ... }@attrs: {
     nixosConfigurations.fnord = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = attrs;
@@ -19,5 +24,13 @@
         }
       ];
     };
-  };
+  } // flake-utils.lib.eachDefaultSystem (system:
+    let pkgs = import nixpkgs { inherit system; };
+        disko-pkgs = disko.packages.${system};
+    in {
+      packages = with pkgs; {
+        inherit (disko-pkgs) disko;
+        default = disko-pkgs.disko;
+      };
+    });
 }
