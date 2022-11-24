@@ -1,6 +1,6 @@
 {
   inputs.nixpkgs.url = github:NixOS/nixpkgs;
-  inputs.disko.url = github:nix-community/disko?ref=zap;
+  inputs.disko.url = github:nix-community/disko;
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.flake-compat = {
     url = "github:edolstra/flake-compat";
@@ -24,6 +24,7 @@
         }
       ];
     };
+    diskoConfigurations.fnord = import ./disk-config.nix;
   } // flake-utils.lib.eachDefaultSystem (system:
     let pkgs = import nixpkgs { inherit system; };
         disko-pkgs = disko.packages.${system};
