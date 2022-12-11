@@ -1,5 +1,20 @@
 # Example to create a bios compatible gpt partition
 { disks ? [ "/dev/sda" ], ... }: {
+  lvm_vg = {
+    pool = {
+      type = "lvm_vg";
+      lvs = {
+        root = {
+          type = "lv";
+          content = {
+            type = "filesystem";
+            format = "ext4";
+            mountpoint = "/";
+          };
+        };
+      };
+    };
+  };
   disk = {
     vdb = {
       device = builtins.elemAt disks 0;
@@ -34,11 +49,15 @@
             start = "100MiB";
             end = "-16G";
             part-type = "primary";
-            bootable = true;
+            flags = ["bios_grub"];
             content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
+              type = "luks";
+              name = "crypted";
+              keyFile = "/tmp/secret.key";
+              content = {
+                type = "lvm_pv";
+                vg = "pool";
+              };
             };
           }
           {
