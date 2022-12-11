@@ -32,13 +32,25 @@
             name = "root";
             type = "partition";
             start = "100MiB";
-            end = "100%";
+            end = "-16G";
             part-type = "primary";
             bootable = true;
             content = {
               type = "filesystem";
               format = "ext4";
               mountpoint = "/";
+            };
+          }
+          {
+            name = "root";
+            type = "partition";
+            start = "-16G";
+            end = "100%";
+            part-type = "primary";
+            bootable = true;
+            content = {
+              type = "swap";
+              randomEncryption = true;
             };
           }
         ];
